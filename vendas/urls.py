@@ -20,5 +20,8 @@ urlpatterns = [
     path('pagamentos/editar/<int:pk>/', views.editar_pagamento, name='editar_pagamento'),
     path('pagamentos/excluir/<int:pk>/', views.excluir_pagamento, name='excluir_pagamento'),
     
+    # Históricos
     path('historico/', views.historico, name='historico'),
+    path('historico/export/csv/', views.export_historico_csv, name='export_historico_csv'),
+    path('historico/export/excel/', views.export_historico_excel, name='export_historico_excel'),
 ]

@@ -4,6 +4,10 @@ from django.core.paginator import Paginator
 from django.db.models import Sum, Q, F
 from .models import Cliente, Compra, Pagamento
 from .forms import ClienteForm, CompraForm, PagamentoForm
+import csv
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
 
 
 def dashboard(request):
@@ -201,3 +205,76 @@ def excluir_pagamento(request, pk):
     get_object_or_404(Pagamento, pk=pk).delete()
     messages.success(request, '🗑️ Pagamento excluído!')
     return redirect('historico')
+
+
+def export_historico_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="historico_completo.csv"'
+
+    writer = csv.writer(response, delimiter=';')  
+    writer.writerow(['Cliente', 'Tipo', 'Data', 'Descrição', 'Valor (R$)'])
+
+    clientes = Cliente.objects.prefetch_related('compras', 'pagamentos').order_by('nome')
+
+    for cliente in clientes:
+        # Compras
+        for compra in cliente.compras.all():
+            writer.writerow([
+                cliente.nome,
+                'COMPRA',
+                compra.data.strftime('%d/%m/%Y'),
+                compra.descricao_produto,
+                f"{compra.valor:.2f}".replace('.', ',')
+            ])
+        
+        # Pagamentos
+        for pag in cliente.pagamentos.all():
+            writer.writerow([
+                cliente.nome,
+                'PAGAMENTO',
+                pag.data.strftime('%d/%m/%Y'),
+                'Pagamento registrado',
+                f"{pag.valor:.2f}".replace('.', ',')
+            ])
+
+    return response
+
+
+# ====================== EXPORTAR HISTÓRICO EXCEL ======================
+def export_historico_excel(request):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Histórico Completo"
+
+    # Cabeçalho
+    headers = ['Cliente', 'Tipo', 'Data', 'Descrição', 'Valor (R$)']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(start_color="E0E0E0", end_color="E0E0E0", fill_type="solid")
+
+    row = 2
+    clientes = Cliente.objects.prefetch_related('compras', 'pagamentos').order_by('nome')
+
+    for cliente in clientes:
+        for compra in cliente.compras.all():
+            ws.cell(row=row, column=1, value=cliente.nome)
+            ws.cell(row=row, column=2, value="COMPRA")
+            ws.cell(row=row, column=3, value=compra.data.strftime('%d/%m/%Y'))
+            ws.cell(row=row, column=4, value=compra.descricao_produto)
+            ws.cell(row=row, column=5, value=float(compra.valor))
+            row += 1
+
+        for pag in cliente.pagamentos.all():
+            ws.cell(row=row, column=1, value=cliente.nome)
+            ws.cell(row=row, column=2, value="PAGAMENTO")
+            ws.cell(row=row, column=3, value=pag.data.strftime('%d/%m/%Y'))
+            ws.cell(row=row, column=4, value="Pagamento registrado")
+            ws.cell(row=row, column=5, value=float(pag.valor))
+            row += 1
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="historico_completo.xlsx"'
+    wb.save(response)
+
+    return response
