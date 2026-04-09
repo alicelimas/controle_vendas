@@ -1,0 +1,77 @@
+{% extends 'vendas/base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card border-0 shadow-sm">
+            
+            <!-- Header -->
+            <div class="card-header bg-white py-4 border-bottom">
+                <h4 class="mb-0 fw-semibold" style="color: #6659D9;">
+                    <i class="fas fa-shopping-cart me-2"></i> Nova Compra
+                </h4>
+            </div>
+
+            <div class="card-body p-5">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {{ form.cliente.label_tag }}
+                            {{ form.cliente }}
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            {{ form.data.label_tag }}
+                            {{ form.data }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.descricao_produto.label_tag }}
+                        {{ form.descricao_produto }}
+                    </div>
+
+                    <div class="mb-5">
+                        {{ form.valor.label_tag }}
+                        <div class="input-group">
+                            <span class="input-group-text fw-bold">R$</span>
+                            {{ form.valor }}
+                        </div>
+                    </div>
+
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-danger px-3 py-2">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success px-3 py-2">
+                            <i class="fas fa-save me-2"></i> Salvar Compra
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Máscara de valor
+document.addEventListener('DOMContentLoaded', function() {
+    const valorInput = document.getElementById('id_valor');
+    if (!valorInput) return;
+
+    valorInput.addEventListener('input', function() {
+        let valor = this.value.replace(/\D/g, '');
+        if (!valor) {
+            this.value = '';
+            return;
+        }
+        this.value = (parseInt(valor) / 100).toFixed(2);
+    });
+});
+</script>
+{% endblock %}

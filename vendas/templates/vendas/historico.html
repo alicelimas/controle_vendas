@@ -1,0 +1,132 @@
+{% extends 'vendas/base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="fw-semibold" style="color: #5977D9;"><i class="fas fa-clock-rotate-left me-2"></i>Histórico Completo</h3>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card border-0 shadow-sm mb-5">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label text-muted small">Nome do Cliente</label>
+                <input type="text" name="nome" class="form-control" 
+                       placeholder="Buscar cliente..." value="{{ nome }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-filtro w-100 py-2" style="color: white;">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Clientes com Accordion -->
+<div class="accordion" id="accordionClientes">
+    {% for cliente in clientes %}
+    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed py-3" type="button" 
+                    data-bs-toggle="collapse" data-bs-target="#c{{ cliente.id }}">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <strong>{{ cliente.nome }}</strong>
+                    <div class="d-flex align-items-center me-3">
+                        <span class="badge bg-success me-2 px-3 py-2">Pago: R$ {{ cliente.total_pagamentos_anno|floatformat:2 }}</span>
+                        <span class="badge bg-danger px-3 py-2">Deve: R$ {{ cliente.saldo_devedor_anno|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </button>
+        </h2>
+        
+        <div id="c{{ cliente.id }}" class="accordion-collapse collapse">
+            <div class="accordion-body bg-light">
+                
+                <!-- Compras -->
+                <h6 class="text-primary mb-3"><i class="fas fa-shopping-bag"></i> Compras</h6>
+                <table class="table table-sm mb-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th class="text-end">Valor</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for compra in cliente.compras.all %}
+                        <tr>
+                            <td>{{ compra.data }}</td>
+                            <td>{{ compra.descricao_produto }}</td>
+                            <td class="text-end fw-medium">R$ {{ compra.valor|floatformat:2 }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'editar_compra' compra.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="confirmarExclusao('{% url 'excluir_compra' compra.id %}', 
+                                    'Tem certeza que deseja excluir a compra de <strong>{{ compra.descricao_produto }}</strong>?')" 
+                                    class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-3">Nenhuma compra registrada</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagamentos -->
+                <h6 class="text-success mb-3"><i class="fas fa-money-bill-wave"></i> Pagamentos</h6>
+                <table class="table table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th class="text-end">Valor</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pag in cliente.pagamentos.all %}
+                        <tr>
+                            <td>{{ pag.data }}</td>
+                            <td class="text-end fw-medium">R$ {{ pag.valor|floatformat:2 }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'editar_pagamento' pag.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="confirmarExclusao('{% url 'excluir_pagamento' pag.id %}', 
+                                    'Tem certeza que deseja excluir este pagamento de <strong>R$ {{ pag.valor }}</strong>?')" 
+                                    class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-3">Nenhum pagamento registrado</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<div class="mt-3 mb-4">
+    {% include 'vendas/pagination.html' with page_obj=clientes %}
+</div>
+
+{% endblock %}

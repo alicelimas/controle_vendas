@@ -1,0 +1,72 @@
+{% extends 'vendas/base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card border-0 shadow-sm">
+            
+            <!-- Header -->
+            <div class="card-header bg-white py-4 border-bottom">
+                <h4 class="mb-0 fw-semibold text-primary">
+                    <i class="fas fa-user-plus me-2"></i> Novo Cliente
+                </h4>
+            </div>
+
+            <div class="card-body p-5">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        {{ form.nome.label_tag }}
+                        {{ form.nome }}
+                        <small class="text-muted">Informe nome e sobrenome</small>
+                    </div>
+
+                    <div class="mb-5">
+                        {{ form.telefone.label_tag }}
+                        <div class="input-group">
+                            <span class="input-group-text">📱</span>
+                            {{ form.telefone }}
+                        </div>
+                        <small class="text-muted">Digite o telefone no padrão (ex: 84 98765-4321)</small>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
+                        <a href="{% url 'lista_clientes' %}" class="btn btn-outline-danger px-3 py-2">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success px-3 py-2">
+                            <i class="fas fa-save me-2"></i> Salvar Cliente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Máscara de Telefone Brasileiro
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('id_telefone');
+    if (!input) return;
+
+    input.addEventListener('keyup', function() {
+        let valor = this.value.replace(/\D/g, '');
+
+        if (valor.length > 11) valor = valor.substring(0, 11);
+
+        let formatado = '';
+        if (valor.length > 0) formatado = '(' + valor.substring(0,2);
+        if (valor.length > 2) formatado += ') ' + valor.substring(2,7);
+        if (valor.length > 7) formatado += '-' + valor.substring(7,11);
+
+        this.value = formatado;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'vendas/base.html' %}
+{% block content %}
+<h3>Confirmar exclusão</h3>
+<p>Tem certeza que deseja excluir {{ tipo }}?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sim, excluir</button>
+    <a href="{% url 'historico' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
