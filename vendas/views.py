@@ -57,7 +57,7 @@ def lista_clientes(request):
         total_pagamentos = cliente.pagamentos.aggregate(total=Sum('valor'))['total'] or 0
         cliente.saldo_devedor_anno = total_compras - total_pagamentos
 
-    paginator = Paginator(clientes_qs, 2)
+    paginator = Paginator(clientes_qs, 10)
     clientes_page = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'vendas/clientes.html', {

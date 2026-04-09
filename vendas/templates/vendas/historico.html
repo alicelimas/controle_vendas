@@ -1,4 +1,5 @@
 {% extends 'vendas/base.html' %}
+{% load extras %}
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -43,8 +44,8 @@
                 <div class="d-flex w-100 justify-content-between align-items-center">
                     <strong>{{ cliente.nome }}</strong>
                     <div class="d-flex align-items-center me-3">
-                        <span class="badge bg-success me-2 px-3 py-2">Pago: R$ {{ cliente.total_pagamentos_anno|floatformat:2 }}</span>
-                        <span class="badge bg-danger px-3 py-2">Deve: R$ {{ cliente.saldo_devedor_anno|floatformat:2 }}</span>
+                        <span class="badge bg-success me-2 px-3 py-2">Pago: R$ {{ cliente.total_pagamentos_anno|br_currency }}</span>
+                        <span class="badge bg-danger px-3 py-2">Deve: R$ {{ cliente.saldo_devedor_anno|br_currency}}</span>
                     </div>
                 </div>
             </button>
@@ -69,7 +70,7 @@
                         <tr>
                             <td>{{ compra.data }}</td>
                             <td>{{ compra.descricao_produto }}</td>
-                            <td class="text-end fw-medium">R$ {{ compra.valor|floatformat:2 }}</td>
+                            <td class="text-end fw-medium">R$ {{ compra.valor|br_currency }}</td>
                             <td class="text-center">
                                 <a href="{% url 'editar_compra' compra.id %}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
@@ -101,7 +102,7 @@
                         {% for pag in cliente.pagamentos.all %}
                         <tr>
                             <td>{{ pag.data }}</td>
-                            <td class="text-end fw-medium">R$ {{ pag.valor|floatformat:2 }}</td>
+                            <td class="text-end fw-medium">R$ {{ pag.valor|br_currency }}</td>
                             <td class="text-center">
                                 <a href="{% url 'editar_pagamento' pag.id %}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
