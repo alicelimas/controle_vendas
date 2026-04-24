@@ -206,6 +206,24 @@ def excluir_pagamento(request, pk):
     messages.success(request, '🗑️ Pagamento excluído!')
     return redirect('historico')
 
+def detalhes_cliente(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    
+    # Calcula totais
+    total_compras = cliente.compras.aggregate(total=Sum('valor'))['total'] or 0
+    total_pagamentos = cliente.pagamentos.aggregate(total=Sum('valor'))['total'] or 0
+    saldo_devedor = total_compras - total_pagamentos
+
+    context = {
+        'cliente': cliente,
+        'total_compras': total_compras,
+        'total_pagamentos': total_pagamentos,
+        'saldo_devedor': saldo_devedor,
+        'compras': cliente.compras.all().order_by('-data'),
+        'pagamentos': cliente.pagamentos.all().order_by('-data'),
+    }
+    return render(request, 'vendas/detalhes_cliente.html', context)
+
 
 def export_historico_csv(request):
     response = HttpResponse(content_type='text/csv')

@@ -135,6 +135,32 @@
             background-color: #e0e0e0;
             color: #999;
         }
+
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .card-body {
+                padding: 1.25rem;
+            }
+            h2, h3 {
+                font-size: 1.45rem;
+            }
+            .table th, .table td {
+                font-size: 0.95rem;
+                padding: 12px 8px;
+            }
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.95rem;
+            }
+            .accordion-button {
+                font-size: 1rem;
+                padding: 16px 20px;
+            }
+        }
+        
     </style>
 </head>
 
@@ -145,12 +171,19 @@
             <a class="navbar-brand" href="{% url 'dashboard' %}">
                 <i class="fas fa-shopping-basket me-2"></i>Controle de Vendas
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link px-3" href="{% url 'dashboard' %}">Dashboard</a>
-                <a class="nav-link px-3" href="{% url 'lista_clientes' %}">Clientes</a>
-                <a class="nav-link px-3" href="{% url 'nova_compra' %}">Nova Compra</a>
-                <a class="nav-link px-3" href="{% url 'novo_pagamento' %}">Novo Pagamento</a>
-                <a class="nav-link px-3" href="{% url 'historico' %}">Histórico</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link px-3" href="{% url 'dashboard' %}">Home</a>
+                    <a class="nav-link px-3" href="{% url 'lista_clientes' %}">Clientes</a>
+                    <a class="nav-link px-3" href="{% url 'nova_compra' %}">Nova Compra</a>
+                    <a class="nav-link px-3" href="{% url 'novo_pagamento' %}">Novo Pagamento</a>
+                    <a class="nav-link px-3" href="{% url 'historico' %}">Histórico</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -183,7 +216,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <form id="deleteForm" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                        <button type="submit" class="btn btn-danger">Sim, excluir</button>
                     </form>
                 </div>
             </div>
